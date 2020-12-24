@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
@@ -39,6 +39,46 @@ function Body() {
   )
 }
 
+function GitHub({ username }) {
+  const [data, setData] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!username) return
+
+    fetch(`https://api.github.com/users/${username}`)
+      .then((response) => response.json())
+      .then(setData)
+      .catch(setError);
+  }, [username]);
+
+  if (error) {
+    return (
+      <div className="App-github">
+        <pre>{JSON.stringify(error, null, 2)}</pre>
+      </div>
+    )
+  }
+  else {
+    if (data) {
+      return (
+        <div className="App-github">
+          <h3>GitHub Account</h3>
+          <p>{data.login}</p>
+          <p>{data.bio}</p>
+        </div>
+      )
+    }
+    else {
+      return (
+        <div className="App-github">
+          User Doesn't Exists
+        </div>
+      )
+    }
+  }
+}
+
 function Footer(props) {
   return (
     <footer className="App-footer">
@@ -47,11 +87,12 @@ function Footer(props) {
   )
 }
 
-function App() {
+function App({ username }) {
   return (
     <React.Fragment className="App">
       <Header />
       <Body />
+      <GitHub username="fgarcialainez" />
       <Footer name="Felix Garcia"/>
     </React.Fragment>
   );
